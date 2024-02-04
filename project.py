@@ -11,12 +11,7 @@ import csv
 Prompt user for weather station per NOAA convention (ex: KCRQ)
 Return station name (ex: McClellan-Palomar Airport), then:
 Prompt user for desired weather detail(s)
-  if valid input
-       return selected weather detail(s)
-  elif no input
-       return some weather details from preselected list
-  else
-      ValueError
+
 """
 
 # https://www.weather.gov/documentation/services-web-api#/
@@ -32,13 +27,15 @@ def station():      # Need to include station input validation
 def weather():
     station_id = station()
     response = requests.get(f"https://api.weather.gov/stations/{station_id}/observations")
-    all_data = response.json()                          # dict
-    list_data = all_data["features"]                    # list
-    element_data = list_data[0]                         # dict
-    properties_data = element_data.get("properties")    # dict
+    data = response.json()                          # dict
+    features_list = data["features"]                    # list
+    element_dict = features_list[0]                         # dict; takes the first element as NWS has standardized format
+    #print(features_list)
+    properties_dict = element_dict.get("properties")    # dict
 
     selection = input("Weather property: ")
-    selection_data = properties_data.get(selection)     # dict
+    # ("Enter a weather property from this list: temperature, barometricPressure, dewpoint /n Weather Property: ")
+    selection_data = properties_dict.get(selection)     # dict
     # Below two lines are to format selection for readability. Ex: barometricPressure --> Barometric pressure, temperature --> Temperature
     s = selection
     result = "".join(' ' + i if i.isupper() else i for i in s).capitalize()
