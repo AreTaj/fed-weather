@@ -18,9 +18,6 @@ Prompt user for desired weather detail(s)
 # https://api.weather.gov/stations/KCRQ/observations 
 
 def main():
-    #station()
-    #api_and_parse()
-    #user_input()
     format_and_print()
 
 def station():      # Need to include station input validation
