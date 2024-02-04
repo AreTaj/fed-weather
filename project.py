@@ -18,13 +18,16 @@ Prompt user for desired weather detail(s)
 # https://api.weather.gov/stations/KCRQ/observations 
 
 def main():
-    weather()
+    #station()
+    #api_and_parse()
+    #user_input()
+    format_and_print()
 
 def station():      # Need to include station input validation
     station = input("Input a weather station: ")
     return station
 
-def weather():
+def api_and_parse():
     station_id = station()
     response = requests.get(f"https://api.weather.gov/stations/{station_id}/observations")
     data = response.json()                          # dict
@@ -32,21 +35,29 @@ def weather():
     element_dict = features_list[0]                         # dict; takes the first element as NWS has standardized format
     #print(features_list)
     properties_dict = element_dict.get("properties")    # dict
+    return properties_dict
 
-    selection = input("Weather property: ")
+def user_input():
     # ("Enter a weather property from this list: temperature, barometricPressure, dewpoint /n Weather Property: ")
-    selection_data = properties_dict.get(selection)     # dict
+    properties = api_and_parse()
+    selection = input("Weather property: ")
+    selection_data = properties.get(selection)     # dict
     # Below two lines are to format selection for readability. Ex: barometricPressure --> Barometric pressure, temperature --> Temperature
     s = selection
     result = "".join(' ' + i if i.isupper() else i for i in s).capitalize()
+    return result, selection_data
 
+def format_and_print():
+    pass_through = user_input()
+    result = pass_through[0]
+    selection_data = pass_through[1]
     unit_code = str(selection_data.get("unitCode"))     # Take unitCode and convert to str
     units = unit_code.split(":")[1]                     # Split unit_code at ":", and only take whatever is to the right into units
     value = str(selection_data.get("value"))            # Take value and convert to str
     #quality_control = selection_data.get("qualityControl")
 
     print(result +": "+ value + " " + units)
-    
+
 
 
 if __name__ == "__main__":
