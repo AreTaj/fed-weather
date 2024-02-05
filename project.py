@@ -1,48 +1,92 @@
 """
+Aresh Tajvar, 2024
+CS50 Python Final Project
+Fed Weather
+
+This program accesses the NOAA free and public-access API at https://api.weather.gov.
+
+Prompts user for weather station per NOAA convention (ex: KSEA for Seattle, WA)
+Return station name (ex: Seattle, Seattle-Tacoma International Airport)
+Prompt user for desired weather detail (ex: temperature, barometricPressure)
+Return selected weather detail (ex: Temperature: 13.7 degC)
+
+Harvard CS50 Final Project:
 https://cs50.harvard.edu/python/2022/project/
 
+Github repository:
+https://github.com/AreTaj/fed-weather
+
+NOAA API Documentation:
+https://www.weather.gov/documentation/services-web-api#/
+
+NOAA Station Observations API:
+https://api.weather.gov/stations/{station}/observations 
+
 """
 
+import re
+import sys
 import requests
-import csv
-# Maybe import BeautifulSoup
 
-"""
-Prompt user for weather station per NOAA convention (ex: KCRQ)
-Return station name (ex: McClellan-Palomar Airport), then:
-Prompt user for desired weather detail(s)
-
-"""
-
-# https://www.weather.gov/documentation/services-web-api#/
-# https://api.weather.gov/stations/KCRQ/observations 
 
 def main():
+    #station()
+    #api_and_parse()
+    #user_input()
     format_and_print()
 
-def station():      # Need to include station input validation
-    station = input("Input a weather station: ")
+
+def station():
+    example_stations = ["KBOS", "KNYC", "KRIC", "KOPF", "KHOU", "KABQ", "KSAN", "KLAX", "KSFO", "KPDX", "KSEA"]
+    while True:
+        station = input("Input a weather station: ")
+        if re.match("^[A-Z]{4}$", station):
+            station_response = requests.get(f"https://api.weather.gov/stations/{station}")
+            if station_response.status_code != 200 and station_response.status_code != 404:     # Checks for API status; if not status_code = 200 (running), then kill
+                sys.exit(f"Error: received status code {station_response.status_code}")
+            elif station_response.status_code == 404:
+                print(f"Incorrect station code. Try one of these: {example_stations}")
+                continue
+            break
+        else:
+            print(f"Invalid station code. Try one of these: {example_stations}")
+            continue
+    station_data = station_response.json()
+    station_properties = station_data["properties"]
+    station_name = station_properties["name"]
+    print(station_name)
     return station
+
 
 def api_and_parse():
     station_id = station()
     response = requests.get(f"https://api.weather.gov/stations/{station_id}/observations")
-    data = response.json()                          # dict
-    features_list = data["features"]                    # list
-    element_dict = features_list[0]                         # dict; takes the first element as NWS has standardized format
-    #print(features_list)
-    properties_dict = element_dict.get("properties")    # dict
-    return properties_dict
+    if response.status_code !=200:      # Checks for API status; if not status_code = 200 (running), then kill
+        sys.exit(f"Error: received status code {response.status_code}")
+    else:
+        data = response.json()                          # dict
+        features_list = data["features"]                    # list
+        element_dict = features_list[0]                         # dict; always takes the first element because NWS has standardized format
+        properties_dict = element_dict.get("properties")    # dict
+        #print(properties_dict.keys())
+        return properties_dict
+
 
 def user_input():
-    # ("Enter a weather property from this list: temperature, barometricPressure, dewpoint /n Weather Property: ")
     properties = api_and_parse()
-    selection = input("Weather property: ")
-    selection_data = properties.get(selection)     # dict
-    # Below two lines are to format selection for readability. Ex: barometricPressure --> Barometric pressure, temperature --> Temperature
-    s = selection
-    result = "".join(' ' + i if i.isupper() else i for i in s).capitalize()
+    while True:
+        valid_properties_list = ["elevation", "temperature", "dewpoint", "windDirection", "windSpeed", "barometricPressure", "seaLevelPressure", "visibility", "relativeHumidity", "windChill"]
+        selection = input("Valid property options: elevation, temperature, dewpoint, windDirection, windSpeed, barometricPressure, seaLevelPressure, visibility, relativeHumidity, windChill.\nInput weather property: ")
+        if selection in valid_properties_list:
+            selection_data = properties.get(selection)     # dict
+            # Below two lines are to format selection for readability. Ex: barometricPressure --> Barometric pressure, temperature --> Temperature
+            result = "".join(' ' + i if i.isupper() else i for i in selection).capitalize()
+            break
+        else:
+            print("\nInvalid weather property")
+            continue
     return result, selection_data
+
 
 def format_and_print():
     pass_through = user_input()
@@ -59,25 +103,3 @@ def format_and_print():
 
 if __name__ == "__main__":
     main()
-
-
-
-"""
-# Old code for cannibalizing
-
-def weather():
-    station_id = station()
-    response = requests.get(f"https://api.weather.gov/stations/{station_id}/observations")
-    data = response.json()
-    return data
-
-def select_weather():
-    weather_data = weather()
-    selection = input("Input a selection: ")
-    select_weather = weather_data["barometricPressure"]
-    return select_weather
-
-with open('file.csv', 'w') as file:
-    csv.writer(file)
-    writerow()
-"""
