@@ -10,11 +10,11 @@ Return station name (ex: Seattle, Seattle-Tacoma International Airport)
 Prompt user for desired weather detail (ex: temperature, barometricPressure)
 Return selected weather detail (ex: Temperature: 13.7 degC)
 
-Harvard CS50 Final Project:
-https://cs50.harvard.edu/python/2022/project/
-
 Github repository:
 https://github.com/AreTaj/fed-weather
+
+Harvard CS50 Python Final Project:
+https://cs50.harvard.edu/python/2022/project/
 
 NOAA API Documentation:
 https://www.weather.gov/documentation/services-web-api#/
@@ -40,7 +40,7 @@ def main():
 
 
 def validate_station(station_input):
-    example_stations = ["KBOS", "KNYC", "KRIC", "KOPF", "KHOU", "KABQ", "KSAN", "KLAX", "KSFO", "KPDX", "KSEA"]
+    example_stations = ["KBOS", "KNYC", "KOPF", "KHOU", "KABQ", "KSAN", "KLAX", "KSFO", "KPDX", "KSEA"]
     while True:
         if re.match("^[A-Z]{4}$", station_input):                                           # Standard is four capital letters
             station_check = requests.get(f"https://api.weather.gov/stations/{station_input}")
@@ -51,7 +51,7 @@ def validate_station(station_input):
                 station_input = input("Input a weather station: ")
                 continue
             break
-        else:                                                                               # Failed regex, reprompt
+        else:                                                                               # If failed regex, reprompt
             print(f"Invalid station code. Try one of these: {example_stations}")
             station_input = input("Input a weather station: ")
             continue
@@ -92,7 +92,6 @@ def get_weather(properties_dict):
             print("\nInvalid weather property")
             selection = input(f"Valid options: {valid_properties_list}.\nInput weather property: ")
             continue
-    print(result, selection_data)
     return result, selection_data
 
 
