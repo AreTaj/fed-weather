@@ -47,12 +47,12 @@ def validate_station(station_input):
             if station_check.status_code != 200 and station_check.status_code != 404:       # Checks for API status; if not status_code = 200 (running), then kill
                 sys.exit(f"Error: received status code {station_check.status_code}")
             elif station_check.status_code == 404:                                          # 404 indicates station does not exist in NOAA database, reprompt
-                print(f"Incorrect station code. Try one of these: {example_stations}")
+                print(f'\nIncorrect station code "{station_input}" or station does not exist. Try one of these: {example_stations}')
                 station_input = input("Input a weather station: ")
                 continue
             break
         else:                                                                               # If failed regex, reprompt
-            print(f"Invalid station code. Try one of these: {example_stations}")
+            print(f'\nInvalid station code "{station_input}". Try one of these: {example_stations}')
             station_input = input("Input a weather station: ")
             continue
     station_code = station_input                                                            # If and only if validation passed, station_input becomes station_code and is returned
@@ -89,7 +89,7 @@ def get_weather(properties_dict):
             result = "".join(' ' + i if i.isupper() else i for i in selection).capitalize() # Ex: barometricPressure --> Barometric pressure, temperature --> Temperature
             break
         else:
-            print("\nInvalid weather property")
+            print(f'\nInvalid weather property "{selection}"')
             selection = input(f"Valid options: {valid_properties_list}.\nInput weather property: ")
             continue
     return result, selection_data
