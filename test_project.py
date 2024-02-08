@@ -7,14 +7,12 @@ Unit Testing
 Note: at least three functions need a related test
 """
 #import pytest
-from project import validate_station, station, api_and_parse, get_weather, format_and_print
+from project import validate_station, station, api_and_parse
 
 def main():
     test_validate_station()
     test_station()
     test_api_and_parse()
-    test_get_weather()
-    test_format_and_print()
 
 def test_validate_station():
     assert validate_station("KSEA") == "KSEA"
